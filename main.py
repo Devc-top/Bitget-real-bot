@@ -1,21 +1,28 @@
-from bitget.spot import get_price
-from strategy.spot_simple import should_buy, should_sell
+from bitget.spot import get_price, place_limit_order
+from strategy.spot_simple import *
+from config.settings import *
 import time
 
-SYMBOL = "BTCUSDT"
-
-print("🚀 Bitget REAL Spot Bot Started")
+print("🚀 Bitget REAL Spot Bot (Safe Mode)")
 
 while True:
     price = get_price(SYMBOL)
-    print("Price:", price)
+    print("📈 Price:", price)
+
+    size = round(ORDER_USDT / price, 6)
 
     if should_buy(price):
-        print("🟢 BUY signal (REAL)")
-        # place_order("buy")  # ENABLE LATER
+        print("🟢 BUY signal")
+        if not DRY_RUN:
+            res = place_limit_order(SYMBOL, "buy", size, price)
+            print("ORDER:", res)
+        on_buy(price)
 
     if should_sell(price):
-        print("🔴 SELL signal (REAL)")
-        # place_order("sell")
+        print("🔴 SELL signal")
+        if not DRY_RUN:
+            res = place_limit_order(SYMBOL, "sell", size, price)
+            print("ORDER:", res)
+        on_sell()
 
-    time.sleep(5)
+    time.sleep(10)
