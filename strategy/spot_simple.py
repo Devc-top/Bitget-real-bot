@@ -1,13 +1,23 @@
-from bitget.spot import get_price
-
 ENTRY_PRICE = None
+IN_POSITION = False
 
 def should_buy(price):
-    global ENTRY_PRICE
-    if ENTRY_PRICE is None:
+    global ENTRY_PRICE, IN_POSITION
+    if not IN_POSITION:
         ENTRY_PRICE = price
-        return False
-    return price < ENTRY_PRICE * 0.995  # buy dip
+        return True
+    return False
 
 def should_sell(price):
-    return price > ENTRY_PRICE * 1.01  # take profit
+    global IN_POSITION
+    if IN_POSITION and price > ENTRY_PRICE * 1.01:
+        return True
+    return False
+
+def on_buy(price):
+    global IN_POSITION
+    IN_POSITION = True
+
+def on_sell():
+    global IN_POSITION
+    IN_POSITION = False
